@@ -1,0 +1,33 @@
+import { eventBus, EVENTS } from '../EventBus.js';
+
+class NotificationAgent {
+  constructor() {
+    eventBus.subscribe(EVENTS.BOOKING_CONFIRMED, this.notifyUser.bind(this));
+    eventBus.subscribe(EVENTS.NEW_PROVIDER_ASSIGNED, this.notifyUser.bind(this));
+    eventBus.subscribe(EVENTS.SERVICE_COMPLETED, this.requestFeedback.bind(this));
+  }
+
+  notifyUser(payload) {
+    setTimeout(() => {
+      eventBus.emit(EVENTS.NOTIFICATION_SENT, {
+        agent: 'NotificationAgent',
+        trace: `Notified User: "Your service provider is confirmed and en-route."`,
+        confidence: 0.98,
+        toolUsed: 'Reason: Dispatched status update to customer communication channel'
+      });
+    }, 1500);
+  }
+
+  requestFeedback() {
+    setTimeout(() => {
+      eventBus.emit(EVENTS.SYSTEM_LOG, { 
+        agent: 'NotificationAgent',
+        trace: `Notification Sent: WhatsApp feedback request dispatched to user. Awaiting customer rating...`,
+        confidence: 1.0,
+        toolUsed: 'ReputationEngine: Multi-Channel Dispatch'
+      });
+    }, 2500);
+  }
+}
+
+export const notificationAgent = new NotificationAgent();

@@ -1,0 +1,12 @@
+[
+  { "id": "p1", "name": "Tariq Mahmood", "category": "AC Repair", "skills": ["Inverter", "Dawlance", "Haier", "Gas Refill"], "rating": 4.88, "reliability": 96, "baseDistance": 4.2, "status": "AVAILABLE", "cancellationRate": 2, "reviewRecency": 95 },
+  { "id": "p2", "name": "Rizwan Ahmed", "category": "AC Repair", "skills": ["General", "Window AC", "Cleaning"], "rating": 4.70, "reliability": 82, "baseDistance": 2.1, "status": "AVAILABLE", "cancellationRate": 15, "reviewRecency": 70 },
+  { "id": "p3", "name": "Kamran Sabir", "category": "AC Repair", "skills": ["Inverter", "Compressor", "Gree"], "rating": 4.45, "reliability": 91, "baseDistance": 5.5, "status": "BUSY", "cancellationRate": 5, "reviewRecency": 85 },
+  { "id": "p4", "name": "Usman Plumber", "category": "Plumbing", "skills": ["Leakage", "Pipes", "Geyser"], "rating": 4.90, "reliability": 98, "baseDistance": 1.5, "status": "AVAILABLE", "cancellationRate": 1, "reviewRecency": 98 },
+  { "id": "p5", "name": "Shahid Ali", "category": "Plumbing", "skills": ["Motor", "Water Tank", "General"], "rating": 4.50, "reliability": 85, "baseDistance": 3.8, "status": "AVAILABLE", "cancellationRate": 8, "reviewRecency": 60 },
+  { "id": "p6", "name": "Bilal Electrician", "category": "Electrician", "skills": ["Wiring", "UPS", "Solar", "Generators"], "rating": 4.95, "reliability": 99, "baseDistance": 2.8, "status": "AVAILABLE", "cancellationRate": 0, "reviewRecency": 100 },
+  { "id": "p7", "name": "Farhan E.", "category": "Electrician", "skills": ["Fans", "Lights", "General"], "rating": 4.60, "reliability": 88, "baseDistance": 6.2, "status": "AVAILABLE", "cancellationRate": 12, "reviewRecency": 40 },
+  { "id": "p8", "name": "Sana Khan", "category": "Beautician", "skills": ["Bridal", "Party Makeup", "Hair"], "rating": 4.92, "reliability": 97, "baseDistance": 4.0, "status": "AVAILABLE", "cancellationRate": 3, "reviewRecency": 92 },
+  { "id": "p9", "name": "Ayesha Beauty", "category": "Beautician", "skills": ["General", "Waxing", "Facial"], "rating": 4.80, "reliability": 90, "baseDistance": 1.2, "status": "AVAILABLE", "cancellationRate": 7, "reviewRecency": 80 },
+  { "id": "p10", "name": "Ali Mechanic", "category": "Car Mechanic", "skills": ["Car Wash", "Engine", "Oil Change"], "rating": 4.75, "reliability": 92, "baseDistance": 3.5, "status": "AVAILABLE", "cancellationRate": 4, "reviewRecency": 88 }
+]
