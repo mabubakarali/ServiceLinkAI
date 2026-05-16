@@ -19,7 +19,7 @@ class DisputeAgent {
         });
 
         this.proposeResolution(rating);
-      }, 1000);
+      }, 500);
     }
   }
 
@@ -40,11 +40,10 @@ class DisputeAgent {
         resolution
       });
 
-      // Simulation: If it's a 1-star, escalate to human
       if (rating === 1) {
         this.escalateToHuman();
       }
-    }, 2000);
+    }, 1000);
   }
 
   escalateToHuman() {
@@ -55,7 +54,7 @@ class DisputeAgent {
         confidence: 1.0,
         toolUsed: 'Reason: Complexity/Severity Threshold reached'
       });
-    }, 1500);
+    }, 1000);
   }
 }
 

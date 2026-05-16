@@ -64,13 +64,9 @@ class BookingAgent {
       eventBus.emit(EVENTS.SERVICE_STARTED, { agent: 'BookingAgent', trace: `Service started. Job status updated to IN_PROGRESS.`, confidence: 1.0, toolUsed: 'Reason: Location verified via GPS' });
     }, 8000);
 
-    let timer2 = setTimeout(() => {
-      eventBus.emit(EVENTS.SERVICE_COMPLETED, { agent: 'BookingAgent', trace: `Service marked completed. Digital receipt generated.`, confidence: 1.0, toolUsed: 'Reason: Provider submitted completion proof' });
-    }, 14000);
-
-    // If failure is injected, we must clear these timeouts!
+    // If failure is injected, we must clear the timeout!
     eventBus.subscribe(EVENTS.PROVIDER_CANCELLED, () => {
-      clearTimeout(timer1); clearTimeout(timer2);
+      clearTimeout(timer1);
     });
   }
 }

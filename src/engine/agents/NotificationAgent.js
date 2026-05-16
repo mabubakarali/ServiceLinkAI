@@ -19,14 +19,18 @@ class NotificationAgent {
   }
 
   requestFeedback() {
+    // Only send the "Awaiting Feedback" notification if the user hasn't already given it
     setTimeout(() => {
+      const state = orchestrator.getState();
+      if (state.feedbackProcessed) return;
+
       eventBus.emit(EVENTS.SYSTEM_LOG, { 
         agent: 'NotificationAgent',
         trace: `Notification Sent: WhatsApp feedback request dispatched to user. Awaiting customer rating...`,
         confidence: 1.0,
         toolUsed: 'ReputationEngine: Multi-Channel Dispatch'
       });
-    }, 2500);
+    }, 500); // Shorter delay so it appears BEFORE the user reacts
   }
 }
 

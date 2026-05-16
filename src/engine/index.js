@@ -11,5 +11,6 @@ import './agents/RecoveryAgent.js';
 import './agents/NotificationAgent.js';
 import './agents/SupervisorAgent.js';
 import './agents/DisputeAgent.js';
+import './agents/QualityAgent.js';
 
 export { eventBus, EVENTS, orchestrator };

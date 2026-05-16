@@ -11,12 +11,16 @@ class PlannerAgent {
     setTimeout(() => {
       const plan = {
         steps: ['MATCH_PROVIDER', 'CALCULATE_PRICE', 'BOOK_SLOT', 'NOTIFY_USER'],
-        complexity: intent.constraints.length > 1 ? 'High' : 'Medium'
+        complexity: (intent.constraints?.length || 0) > 1 ? 'High' : 'Medium'
       };
+
+      const planTrace = intent.suggestedStartTime 
+        ? `Temporal constraint detected (${intent.eventTime}). Re-sequencing: Arrival mandated at ${intent.suggestedStartTime}. \nSteps: ${plan.steps.join(' -> ')}`
+        : `Generated DAG based on ${plan.complexity} Complexity. Steps: ${plan.steps.join(' -> ')}`;
 
       eventBus.emit(EVENTS.PLAN_CREATED, { 
         agent: 'PlannerAgent',
-        trace: `Generated DAG based on High Complexity. Steps: ${plan.steps.join(' -> ')}`,
+        trace: planTrace,
         confidence: 0.99,
         toolUsed: 'Reason: Mapped extracted intent to structured execution DAG',
         plan 

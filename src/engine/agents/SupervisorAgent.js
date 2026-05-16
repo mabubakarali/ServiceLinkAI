@@ -14,11 +14,11 @@ class SupervisorAgent {
     const state = orchestrator.getState();
     const isUrgent = state.extractedIntent?.urgency === 'High';
 
-    if (isUrgent && selectedProvider.reliability < 90) {
+    if (isUrgent && selectedProvider.reliability < 0.90) {
       setTimeout(() => {
         eventBus.emit(EVENTS.SUPERVISOR_OVERRIDE, {
           agent: 'SupervisorAgent',
-          trace: `OVERRIDE: Selected provider (${selectedProvider.name}) has ${selectedProvider.reliability}% reliability. Minimum 90% required for HIGH urgency tasks.`,
+          trace: `OVERRIDE: Selected provider (${selectedProvider.name}) has ${(selectedProvider.reliability * 100).toFixed(0)}% reliability. Minimum 90% required for HIGH urgency tasks.`,
           confidence: 1.0,
           toolUsed: 'RiskModel'
         });

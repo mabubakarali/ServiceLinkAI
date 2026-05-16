@@ -78,21 +78,35 @@ class Orchestrator {
     
     eventBus.subscribe(EVENTS.FEEDBACK_COLLECTED, (payload) => {
       if (this.globalState.feedbackProcessed) return;
-      this.updateState({ feedbackProcessed: true });
-
-      const state = this.globalState;
-      const summary = `Service Type: ${state.extractedIntent?.service || 'Unknown'}\nProvider Selected: ${state.selectedProvider?.name || 'N/A'}\nFinal Price: Rs ${state.pricing?.total || 0}\nTotal Time: ~45 mins\nRecovery Workflow Used: ${state.failures > 0 ? 'Yes' : 'No'}\nSystem Confidence: HIGH (98%)`;
       
-      eventBus.emit(EVENTS.SESSION_ENDED, {
-        agent: 'Orchestrator',
-        trace: summary, 
-        confidence: 1.0, 
-        toolUsed: 'Reason: Lifecycle successfully closed and state preserved'
+      const isDispute = payload.rating < 3;
+      
+      this.updateState({ 
+        feedbackProcessed: true
       });
-    });
 
-    eventBus.subscribe(EVENTS.SESSION_ENDED, () => {
-      this.updateState({ status: 'FINISHED_ALL' });
+      // Schedule the Session Summary with a conditional delay
+      // If it's a dispute, we give the DisputeAgent time to work (3s)
+      // Otherwise, we end quickly (1s)
+      const sessionEndDelay = isDispute ? 3500 : 1000;
+
+      setTimeout(() => {
+        const updatedState = this.globalState;
+        const summary = `Service Type: ${updatedState.extractedIntent?.service || 'Unknown'}\nProvider Selected: ${updatedState.selectedProvider?.name || 'N/A'}\nFinal Price: Rs ${updatedState.pricing?.total || 0}\nTotal Time: ~45 mins\nRecovery Workflow Used: ${updatedState.failures > 0 ? 'Yes' : 'No'}\nSystem Confidence: HIGH (98%)`;
+        
+        const finalLog = {
+          agent: 'Orchestrator',
+          action: 'SESSION_ENDED',
+          trace: summary, 
+          confidence: 1.0, 
+          toolUsed: 'Reason: Lifecycle successfully closed and state preserved'
+        };
+
+        this.updateState({ 
+          status: 'FINISHED_ALL',
+          logs: [...this.globalState.logs, finalLog]
+        });
+      }, sessionEndDelay);
     });
 
     eventBus.subscribe(EVENTS.PROVIDER_CANCELLED, () => {
@@ -107,6 +121,16 @@ class Orchestrator {
 
     eventBus.subscribe(EVENTS.RE_RANK_REQUESTED, () => {
       this.updateState({ conflictResolved: true });
+      
+      // Circuit Breaker: Prevent infinite re-ranking loops
+      if (this.globalState.overrides > 3) {
+        eventBus.emit(EVENTS.CLARIFICATION_REQUESTED, {
+          agent: 'Orchestrator',
+          trace: `HALTING LOOP: System has attempted re-ranking ${this.globalState.overrides} times without success. Supervisor requirements are not being met by available providers.`,
+          confidence: 1.0,
+          toolUsed: 'Reason: Agentic Circuit Breaker'
+        });
+      }
     });
 
     eventBus.subscribe(EVENTS.DISPUTE_RAISED, () => this.updateState({ status: 'DISPUTE_ACTIVE' }));
@@ -114,8 +138,8 @@ class Orchestrator {
     eventBus.subscribe(EVENTS.HUMAN_ESCALATION, () => this.updateState({ status: 'HUMAN_INTERVENTION_REQUIRED' }));
 
     eventBus.subscribe(EVENTS.SYSTEM_LOG, (log) => {
-      const logs = [...this.globalState.logs, log];
-      this.updateState({ logs });
+      this.globalState.logs = [...this.globalState.logs, log];
+      eventBus.emit(EVENTS.STATE_UPDATED, { state: this.globalState });
     });
   }
 

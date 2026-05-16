@@ -80,6 +80,25 @@ function App() {
               </div>
             </div>
           )}
+
+          {/* Service Quality Loop (Sidebar Integration) */}
+          {state.dynamicChecklist && (state.status === 'SERVICE_STARTED' || state.status === 'SERVICE_COMPLETED' || state.status === 'FINISHED_ALL') && (
+            <div style={{ marginTop: '20px', borderTop: '1px solid var(--border-color)', paddingTop: '16px' }}>
+              <strong style={{ display: 'block', marginBottom: '12px', color: 'var(--accent-blue)', fontSize: '12px', textTransform: 'uppercase' }}>Quality Audit</strong>
+              <div className="checklist-container">
+                {state.dynamicChecklist.map((item, idx) => (
+                  <div key={idx} className="checklist-item" style={{ fontSize: '11px', marginBottom: '4px' }}>
+                    <input type="checkbox" checked={item.completed} readOnly style={{ width: '12px', height: '12px' }} /> 
+                    <span style={{ color: item.completed ? 'var(--accent-emerald)' : 'var(--text-main)', opacity: item.completed ? 1 : 0.6 }}>{item.task}</span>
+                  </div>
+                ))}
+              </div>
+              <div style={{ marginTop: '12px', fontSize: '9px', color: 'var(--accent-emerald)', fontStyle: 'italic' }}>
+                [GEO-TAG: {state.extractedIntent?.location || 'Verified'}]
+              </div>
+            </div>
+          )}
+
           {state.pricing && (
             <div style={{ marginBottom: '16px', padding: '12px', backgroundColor: 'rgba(210, 153, 34, 0.1)', border: '1px solid var(--warning-orange)', borderRadius: '6px' }}>
               <strong style={{ display: 'block', marginBottom: '8px', color: 'var(--warning-orange)' }}>Pricing Transparency</strong>
@@ -104,8 +123,8 @@ function App() {
       <main className="main-content">
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
           <h2>Antigravity Reasoning Trace</h2>
-          <div style={{ fontSize: '11px', color: 'var(--text-muted)' }}>AGENTIC FLOW ACTIVE</div>
         </div>
+
         <div className="terminal" ref={terminalRef}>
           {state.logs.length === 0 ? (
             <div style={{ color: 'var(--text-muted)', fontStyle: 'italic' }}>Awaiting dynamic input...</div>
@@ -214,7 +233,9 @@ function App() {
               {[1, 2, 3, 4, 5].map(star => (
                 <button 
                   key={star} 
-                  onClick={() => eventBus.emit(EVENTS.FEEDBACK_COLLECTED, { rating: star, agent: 'User', trace: `User provided ${star}-star feedback.` })}
+                  onClick={() => {
+                    eventBus.emit(EVENTS.FEEDBACK_COLLECTED, { rating: star, agent: 'User', trace: `User provided ${star}-star feedback.` });
+                  }}
                   style={{ 
                     width: '48px', height: '48px', cursor: 'pointer', backgroundColor: '#21262d', border: '1px solid #30363d', 
                     borderRadius: '50%', color: '#e6edf3', fontSize: '18px', display: 'flex', justifyContent: 'center', alignItems: 'center',
