@@ -1,4 +1,5 @@
 import { eventBus, EVENTS } from '../EventBus.js';
+import { orchestrator } from '../Orchestrator.js';
 
 class NotificationAgent {
   constructor() {

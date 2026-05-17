@@ -43,10 +43,10 @@ export function MatchPanel({ rankedProviders, selectedProvider }) {
                 </div>
 
                 <div className="provider-metrics" aria-label="Provider metrics breakdown">
-                  <span>Dist {p?.breakdown?.distanceScore?.toFixed(1) ?? 'N/A'}</span>
-                  <span>Rate {p?.breakdown?.ratingScore?.toFixed(1) ?? 'N/A'}</span>
-                  <span>Skill {p?.breakdown?.skillScore?.toFixed(1) ?? 'N/A'}</span>
-                  <span>Rel {p?.breakdown?.reliabilityScore?.toFixed(1) ?? 'N/A'}</span>
+                  <span>Dist {p?.displayScores?.dist ?? p?.baseDistance?.toFixed(1) ?? 'N/A'} km</span>
+                  <span>Rate {p?.displayScores?.rate ?? p?.rating?.toFixed(1) ?? 'N/A'} ★</span>
+                  <span>Skill {p?.displayScores?.skill ?? 'N/A'}</span>
+                  <span>Rel {p?.displayScores?.rel ?? 'N/A'}</span>
                 </div>
 
                 <div className="provider-reasoning">

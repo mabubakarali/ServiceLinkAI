@@ -28,7 +28,11 @@ class SupervisorAgent {
     } else {
       setTimeout(() => {
         const rejectedName = payload.rejectedProviders[0]?.name || 'None';
-        const reasoningTrace = `DECISION_CARD:\nSelected Provider: ${selectedProvider.name}\nReasons: Optimal proximity, high skill match, and strong past reliability.\nWeighted Factors: Distance (40%), Skill (20%), Reliability (30%).\nRejected ${rejectedName}: Lower overall confidence score.`;
+        const isComplex = state.extractedIntent?.complexity === 'Complex';
+        const weightSummary = isComplex
+          ? 'Skill (45%), Reliability (10%), Distance (10%), Cancellation Rate (10%), Fairness (10%), Recency (5%), Experience (5%), Rating (5%)'
+          : 'Skill (15%), Distance (15%), Reliability (15%), Cancellation (15%), Fairness (10%), Rating (10%), Recency (10%), Experience (10%)';
+        const reasoningTrace = `DECISION_CARD:\nSelected Provider: ${selectedProvider.name}\nReasons: Optimal proximity, high skill match, and strong past reliability.\nWeighted Factors: ${weightSummary}\nRejected ${rejectedName}: Lower overall confidence score.`;
         
         eventBus.emit(EVENTS.PROVIDER_SELECTED, { 
           ...payload,

@@ -16,10 +16,15 @@ class BookingAgent {
       // Simulation: Scheduling Intelligence (Double-Booking Check)
       // Trigger a conflict if "9 baje" is mentioned and it's the first attempt
       if (input.includes('9 baje') && !isRecovery && !state.conflictResolved) {
+        const requestedTime = state.extractedIntent?.eventTime || '09:00';
+        const [hh] = requestedTime.split(':');
+        const altHour = (parseInt(hh) + 1).toString().padStart(2, '0');
+        const alternateSlot = `${altHour}:00`;
+
         eventBus.emit(EVENTS.SYSTEM_LOG, {
           agent: 'BookingAgent',
           action: 'CONFLICT_DETECTED',
-          trace: `Scheduling Conflict: Selected provider has an overlapping appointment at 09:00 AM.`,
+          trace: `Scheduling Conflict: Selected provider has an overlapping appointment at ${requestedTime}.\nScheduling Intelligence: Alternate slot available at ${alternateSlot}. Initiating auto re-rank to find provider with clear ${requestedTime} slot + 30-min travel buffer.`,
           confidence: 0.98,
           toolUsed: 'Reason: Calendar Overlap Analysis'
         });
@@ -27,7 +32,7 @@ class BookingAgent {
         setTimeout(() => {
           eventBus.emit(EVENTS.RE_RANK_REQUESTED, { 
             agent: 'BookingAgent',
-            trace: 'Scheduling Intelligence: Automatically re-ranking to find provider with clear 09:00 AM slot + travel buffer.',
+            trace: `Scheduling Intelligence: Automatically re-ranking to find provider with clear ${requestedTime} slot + travel buffer. Alternate slot ${alternateSlot} reserved as fallback.`,
             confidence: 1.0,
             toolUsed: 'Reason: Automated Conflict Resolution',
             excludeId: state.selectedProvider.id

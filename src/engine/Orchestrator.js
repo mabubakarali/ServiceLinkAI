@@ -92,7 +92,8 @@ class Orchestrator {
 
       setTimeout(() => {
         const updatedState = this.globalState;
-        const summary = `Service Type: ${updatedState.extractedIntent?.service || 'Unknown'}\nProvider Selected: ${updatedState.selectedProvider?.name || 'N/A'}\nFinal Price: Rs ${updatedState.pricing?.total || 0}\nTotal Time: ~45 mins\nRecovery Workflow Used: ${updatedState.failures > 0 ? 'Yes' : 'No'}\nSystem Confidence: HIGH (98%)`;
+        const recoveryUsed = updatedState.failures > 0 ? 'Yes (Provider Cancellation)' : updatedState.conflictResolved ? 'Yes (Scheduling Conflict Auto-Resolved)' : 'No';
+        const summary = `Service Type: ${updatedState.extractedIntent?.service || 'Unknown'}\nProvider Selected: ${updatedState.selectedProvider?.name || 'N/A'}\nFinal Price: Rs ${updatedState.pricing?.total || 0}\nTotal Time: ~45 mins\nRecovery Workflow Used: ${recoveryUsed}\nSystem Confidence: HIGH (98%)`;
         
         const finalLog = {
           agent: 'Orchestrator',
