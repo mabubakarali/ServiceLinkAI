@@ -8,43 +8,107 @@ import { ErrorBoundary } from './components/ErrorBoundary.jsx';
 
 const FeedbackOverlay = memo(FeedbackOverlayComponent);
 
-// ─── TRACE PANEL (internal scroll only) ──────────────────────────────────────
+// ─── TRACE PANEL (smart auto-scroll) ─────────────────────────────────────────
 function TracePanel({ logs }) {
   const ref = useRef(null);
+  const [locked, setLocked] = useState(false);   // true = user scrolled up, pause auto-scroll
+  const [newCount, setNewCount] = useState(0);    // badge count while locked
+  const prevLenRef = useRef(0);
+
+  // Detect manual scroll up → lock auto-scroll
+  const handleScroll = () => {
+    const el = ref.current;
+    if (!el) return;
+    const atBottom = el.scrollHeight - el.scrollTop - el.clientHeight < 60;
+    if (atBottom) {
+      setLocked(false);
+      setNewCount(0);
+    } else {
+      setLocked(true);
+    }
+  };
+
+  // When new logs arrive
   useEffect(() => {
+    const added = logs.length - prevLenRef.current;
+    prevLenRef.current = logs.length;
+    if (added <= 0) return;
+
+    if (locked) {
+      // Don't scroll — just increment badge
+      setNewCount(c => c + added);
+    } else {
+      // Auto-scroll to bottom
+      if (ref.current) ref.current.scrollTop = ref.current.scrollHeight;
+    }
+  }, [logs, locked]);
+
+  const scrollToBottom = () => {
     if (ref.current) ref.current.scrollTop = ref.current.scrollHeight;
-  }, [logs]);
+    setLocked(false);
+    setNewCount(0);
+  };
 
   return (
-    <div className="trace-panel" ref={ref} role="log" aria-live="polite" aria-label="Agent reasoning trace">
-      {logs.length === 0 ? (
-        <div className="trace-empty">
-          <div className="trace-orb" aria-hidden="true" />
-          <span>Awaiting orchestration — submit a request to begin</span>
-        </div>
-      ) : (
-        logs.map((log, idx) => {
-          const t = idx * 3;
-          const conf = log.confidence || 0.98;
-          const isSession = log.action === 'SESSION_ENDED';
-          const isCard = log.trace?.includes('DECISION_CARD');
-          return (
-            <div key={idx} className={`trace-entry ${isSession ? 'trace-session' : isCard ? 'trace-card' : ''}`}>
-              <div className="trace-meta">
-                <span className="trace-agent">{log.agent}</span>
-                <span className="trace-time">T+{t}s</span>
-                <span className={`trace-conf ${conf >= 0.7 ? 'ok' : 'warn'}`}>{(conf * 100).toFixed(0)}%</span>
+    <div style={{ position: 'relative', flex: 1, minHeight: 0, display: 'flex', flexDirection: 'column' }}>
+      <div
+        className="trace-panel"
+        ref={ref}
+        role="log"
+        aria-live="polite"
+        aria-label="Agent reasoning trace"
+        onScroll={handleScroll}
+      >
+        {logs.length === 0 ? (
+          <div className="trace-empty">
+            <div className="trace-orb" aria-hidden="true" />
+            <span>Awaiting orchestration — submit a request to begin</span>
+          </div>
+        ) : (
+          logs.map((log, idx) => {
+            const t = idx * 3;
+            const conf = log.confidence || 0.98;
+            const isSession = log.action === 'SESSION_ENDED';
+            const isCard = log.trace?.includes('DECISION_CARD');
+            return (
+              <div key={idx} className={`trace-entry ${isSession ? 'trace-session' : isCard ? 'trace-card' : ''}`}>
+                <div className="trace-meta">
+                  <span className="trace-agent">{log.agent}</span>
+                  <span className="trace-time">T+{t}s</span>
+                  <span className={`trace-conf ${conf >= 0.7 ? 'ok' : 'warn'}`}>{(conf * 100).toFixed(0)}%</span>
+                </div>
+                <div className="trace-event">{log.action}</div>
+                {log.toolUsed && <div className="trace-tool">{log.toolUsed}</div>}
+                <div className="trace-body">{isCard ? log.trace.replace('DECISION_CARD:\n', '') : log.trace}</div>
               </div>
-              <div className="trace-event">{log.action}</div>
-              {log.toolUsed && <div className="trace-tool">{log.toolUsed}</div>}
-              <div className="trace-body">{isCard ? log.trace.replace('DECISION_CARD:\n', '') : log.trace}</div>
-            </div>
-          );
-        })
+            );
+          })
+        )}
+      </div>
+
+      {/* ── Floating "scroll to bottom" badge — appears when locked ── */}
+      {locked && (
+        <button
+          onClick={scrollToBottom}
+          aria-label="Scroll to latest events"
+          style={{
+            position: 'absolute', bottom: '12px', left: '50%', transform: 'translateX(-50%)',
+            background: 'linear-gradient(135deg, var(--accent-primary), var(--accent-secondary))',
+            color: '#000', border: 'none', borderRadius: '999px',
+            padding: '6px 16px', fontSize: '.75rem', fontWeight: 800,
+            cursor: 'pointer', boxShadow: '0 4px 16px rgba(0,0,0,.6)',
+            display: 'flex', alignItems: 'center', gap: '6px',
+            animation: 'reveal-up .3s ease both', zIndex: 10,
+            whiteSpace: 'nowrap'
+          }}
+        >
+          ↓ {newCount > 0 ? `${newCount} new event${newCount > 1 ? 's' : ''}` : 'Latest'}
+        </button>
       )}
     </div>
   );
 }
+
 
 // ─── LIFECYCLE STEPPER ────────────────────────────────────────────────────────
 function Stepper({ steps, status }) {
