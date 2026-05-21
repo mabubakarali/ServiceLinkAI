@@ -1,7 +1,6 @@
 # ServiceLink AI — Agentic Service Orchestrator
 
-> **AISeekho 2026 Hackathon — Challenge 2: AI-Powered Service Marketplace**  
-> An autonomous, multi-agent platform that connects Pakistani households with skilled service providers using natural language, real-time scheduling intelligence, and closed-loop reputation management.
+ > An autonomous, multi-agent platform that connects Pakistani households with skilled service providers using natural language, real-time scheduling intelligence, and closed-loop reputation management.
 
 ---
 
@@ -427,6 +426,3 @@ ServiceLinkAI/
 ## 👥 Team
  Muhammad Abubakar Ali
  Muhammad Taha
-**AISeekho 2026 — Challenge 2: AI-Powered Service Marketplace**
-
-Built with ❤️ using Google Gemini 2.5 Flash, Google Maps API, React, CapacitorJS, and Antigravity.
